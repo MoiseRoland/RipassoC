@@ -1,78 +1,160 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define MAX_LENGTH 50
-#define MAX_LIBRI 100
+#include <string.h>
+
+#define MAX_LIBRI 50
 #define MAX_CATEGORIE 10
-typedef struct
-{
-    char titolo[MAX_LENGTH];
-    char autore[MAX_LENGTH];
-    int annoPubblicazione;
+#define MAX_TITOLO_LEN 100
+#define MAX_AUTORE_LEN 50
+#define MAX_CATEGORIA_LEN 50
+#define MAX_RIGA_LEN 256
+
+// Definizione della struttura del libro
+typedef struct {
+    char titolo[MAX_TITOLO_LEN];
+    char autore[MAX_AUTORE_LEN];
+    int anno;
     float prezzo;
 } Libro;
 
-typedef struct
-{
-    char nome[MAX_LENGTH];
-    Libro lib[MAX_LIBRI];
-    int numeroLibri;
+// Definizione della struttura della categoria
+typedef struct {
+    char nome[MAX_CATEGORIA_LEN];
+    Libro libri[MAX_LIBRI];
+    int num_libri;
 } Categoria;
 
-Categoria categorie[MAX_CATEGORIE];
-int contaCat = 0;
+// Funzione per stampare i libri di una categoria
+void stampaLibriInCategoria(Categoria *categorie, int num_categorie, char *nome_categoria) {
+    int i, j;
+    for (i = 0; i < num_categorie; i++) {
+        if (strcmp(categorie[i].nome, nome_categoria) == 0) {
+            printf("Libri nella categoria '%s':\n", nome_categoria);
+            for (j = 0; j < categorie[i].num_libri; j++) {
+                printf("- Titolo: %s, Autore: %s, Anno: %d, Prezzo: %.2f\n",
+                       categorie[i].libri[j].titolo,
+                       categorie[i].libri[j].autore,
+                       categorie[i].libri[j].anno,
+                       categorie[i].libri[j].prezzo);
+            }
+            return;
+        }
+    }
+    printf("Nessuna categoria trovata con il nome '%s'.\n", nome_categoria);
+}
 
-void prendiDaFile()
-{
-    Libro libro;
-    FILE *file = fopen("libreria_libri.csv", "r");
-    if (!file)
-    {
-        exit(0);
+// Funzione per cercare un libro per titolo
+void cercaLibroPerTitolo(Categoria *categorie, int num_categorie, char *titolo) {
+    int i, j;
+    for (i = 0; i < num_categorie; i++) {
+        for (j = 0; j < categorie[i].num_libri; j++) {
+            if (strcmp(categorie[i].libri[j].titolo, titolo) == 0) {
+                printf("Libro trovato:\n");
+                printf("- Titolo: %s, Autore: %s, Anno: %d, Prezzo: %.2f\n",
+                       categorie[i].libri[j].titolo,
+                       categorie[i].libri[j].autore,
+                       categorie[i].libri[j].anno,
+                       categorie[i].libri[j].prezzo);
+                return;
+            }
+        }
     }
-    char line[256];
-    fgets(line, sizeof(line), file);
-    int conta = 0;
-    while (fgets(line, sizeof(line), file))
-    {
-        //lettura titolo
-        int i = 0;
-        while (line[i] != ',' && line[i] != '\0')
-        {
-            libro.titolo[i] = line[i];
-            i++;
+    printf("Nessun libro trovato con il titolo '%s'.\n", titolo);
+}
+
+// Funzione per aggiungere un libro a una categoria
+void aggiungiLibroACategoria(Categoria *categorie, int *num_categorie, char *nome_categoria, Libro nuovo_libro) {
+    int i;
+    // Cerca se la categoria esiste già
+    for (i = 0; i < *num_categorie; i++) {
+        if (strcmp(categorie[i].nome, nome_categoria) == 0) {
+            // Aggiungi il libro alla categoria esistente
+            if (categorie[i].num_libri < MAX_LIBRI) {
+                categorie[i].libri[categorie[i].num_libri++] = nuovo_libro;
+            } else {
+                printf("Errore: la categoria '%s' è piena.\n", nome_categoria);
+            }
+            return;
         }
-        libro.titolo[i]= '\0';
-        i++;
-        int j = 0;
-        //lettura autore
-        while (line[j] != ',' && line[j] != '\0')
-        {
-            libro.autore[j] = line[j];
-            i++;
-        }
-        libro.autore[j]= '\0';
-        j++;
-        int k =0;
-        while (line[k] != ',' && line[k] != '\0')
-        {
-            libro.prezzo[k] = line[k];
-            k++;
-        }
-        libro.autore[k]= '\0';
-        k++;
     }
+
+    // Se la categoria non esiste, creala
+    if (*num_categorie < MAX_CATEGORIE) {
+        strcpy(categorie[*num_categorie].nome, nome_categoria);
+        categorie[*num_categorie].libri[0] = nuovo_libro;
+        categorie[*num_categorie].num_libri = 1;
+        (*num_categorie)++;
+    } else {
+        printf("Errore: numero massimo di categorie raggiunto.\n");
+    }
+}
+
+void caricaLibriDaCSV(Categoria *categorie, int *num_categorie) {
+    char *nome_file = "libri.csv";
+    FILE *file = fopen(nome_file, "r");
+    if (!file) {
+        printf("Errore nell'apertura del file CSV.\n");
+        return;
+    }
+
+    char riga[MAX_RIGA_LEN];
+    while (fgets(riga, sizeof(riga), file)) {
+        Libro nuovo_libro;
+        char categoria[MAX_CATEGORIA_LEN];
+        int campo = 0;
+        int lunghezza_riga = strlen(riga);
+        int i, j = 0;
+
+        char temp[MAX_RIGA_LEN] = {0};  // Buffer per i campi
+        for (i = 0; i <= lunghezza_riga; i++) {
+            if (riga[i] == ',' || riga[i] == '\n' || riga[i] == '\0') {
+                temp[j] = '\0';  // Termina la stringa temporanea
+
+                // Gestisci il campo corrente
+                if (campo == 0) {
+                    strcpy(nuovo_libro.titolo, temp);
+                } else if (campo == 1) {
+                    strcpy(nuovo_libro.autore, temp);
+                } else if (campo == 2) {
+                    nuovo_libro.anno = atoi(temp);
+                } else if (campo == 3) {
+                    nuovo_libro.prezzo = atof(temp);
+                } else if (campo == 4) {
+                    strcpy(categoria, temp);
+                }
+                // Resetta il buffer 
+                j = 0;
+                campo++;
+            } else {
+                temp[j++] = riga[i];
+            }
+        }
+
+        // Aggiungi il libro alla categoria
+        aggiungiLibroACategoria(categorie, num_categorie, categoria, nuovo_libro);
+    }
+    printf("Tutti i libri sono stati aggiunti");
 
     fclose(file);
 }
-int main()
-{
-    FILE *fp;
-    fp = fopen("libreria.csv", "r");
-    if (fp == NULL)
-    {
-        printf("Impossibile aprire il file");
-        exit(0);
-    }
+
+int main() {
+    // Definizione delle categorie
+    Categoria categorie[MAX_CATEGORIE];
+    int num_categorie = 0;
+
+    // Caricamento dei libri dal file CSV
+    caricaLibriDaCSV(categorie, &num_categorie);
+    printf("\nInserisci titolo da cercare\n");
+    char titoloCercato[50];
+    scanf(" %[^\n]s", titoloCercato);
+    cercaLibroPerTitolo(categorie, num_categorie, titoloCercato);
+    printf("\n");
+    printf("\nInserisci categoria da cercare\n");
+    char categoriaCercata[50];
+    scanf(" %[^\n]s", categoriaCercata); // Legge l'intera riga di input, inclusi gli spazi
+    stampaLibriInCategoria(categorie, num_categorie, categoriaCercata);
+    printf("\n");
 
     return 0;
 }
