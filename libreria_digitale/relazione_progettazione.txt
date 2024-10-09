@@ -1,0 +1,50 @@
+Relazione sulla Progettazione e sulle Firme delle Funzioni
+
+1. Progettazione del Programma
+
+Il programma è stato progettato per gestire una libreria di libri suddivisi in categorie. La struttura principale del programma include due tipi di dati: "Libro" e "Categoria":
+
+- Libro: rappresenta un libro e contiene i seguenti campi:
+  - `titolo`: il titolo del libro.
+  - `autore`: l'autore del libro.
+  - `anno`: l'anno di pubblicazione del libro.
+  - `prezzo`: il prezzo del libro.
+
+- Categoria: rappresenta una categoria di libri e contiene:
+  - `nome`: il nome della categoria.
+  - `libri`: un array di libri appartenenti a quella categoria.
+  - `num_libri`: il numero di libri presenti nella categoria.
+
+Il programma permette di caricare i libri da un file CSV, cercare libri per titolo e stampare i libri di una categoria specifica.
+
+2. Firme delle Funzioni
+
+- `void stampaLibriInCategoria(Categoria *categorie, int num_categorie, char *nome_categoria)`
+Questa funzione stampa tutti i libri appartenenti a una specifica categoria, avendo la categoria inserita dal utente.
+    - `Categorie *categorie`: puntatore all'array di categorie.
+    - `int num_categorie`: numero di categorie.
+    - `char *nome_categoria`: nome della categoria da cercare.
+
+- `void cercaLibroPerTitolo(Categoria *categorie, int num_categorie, char *titolo)`
+Questa funzione cerca un libro in base al titolo, inserito dal utente, e stampa i dettagli se trovato.
+    - `Categoria *categorie`: puntatore all'array di categorie.
+    - `int num_categorie`: numero di categorie.
+    - `char *titolo`: titolo del libro da cercare.
+
+- `void aggiungiLibroACategoria(Categoria *categorie, int *num_categorie, char *nome_categoria, Libro nuovo_libro)`
+Questa funzione aggiunge un nuovo libro a una categoria esistente o crea una nuova categoria se non esiste.
+    - `Categoria *categorie`: puntatore all'array di categorie.
+    - `int *num_categorie`: puntatore al numero di categorie.
+    - `char *nome_categoria`: nome della categoria a cui aggiungere il libro.
+    - `Libro nuovo_libro`: il libro da aggiungere.
+
+- `void caricaLibriDaCSV(Categoria *categorie, int *num_categorie)`
+Questa funzione carica i libri da un file CSV e li aggiunge alle categorie appropriate.
+    - `Categoria *categorie`: puntatore all'array di categorie.
+    - `int *num_categorie`: puntatore al numero di categorie.
+
+3.Conclusione
+
+Il programma è stato progettato per essere facilmente estensibile. Aggiungendo anche nuovi libri al file CSV, è possibile aggiornare la libreria senza modificare il codice. L'uso di strutture per rappresentare libri e categorie rende il codice chiaro e manutenibile.
+
+*il file csv è stato modificato aggiungendo le categorie, quindi la gestione delle categorie è stata risolta aggiungendo un nuovo attributo alla "libreria".
