@@ -4,14 +4,12 @@
 
 #define MAX_LIBRI 50
 #define MAX_CATEGORIE 10
-#define MAX_TITOLO_LEN 100
-#define MAX_AUTORE_LEN 50
-#define MAX_CATEGORIA_LEN 50
+#define MAX_LENGTH 100
 #define MAX_RIGA_LEN 256
 
 // Definizione della struttura del libro
 typedef struct {
-    char titolo[MAX_TITOLO_LEN];
+    char titolo[MAX_LENGTH];
     char autore[MAX_AUTORE_LEN];
     int anno;
     float prezzo;
@@ -19,7 +17,7 @@ typedef struct {
 
 // Definizione della struttura della categoria
 typedef struct {
-    char nome[MAX_CATEGORIA_LEN];
+    char nome[MAX_LENGTH];
     Libro libri[MAX_LIBRI];
     int num_libri;
 } Categoria;
@@ -73,6 +71,7 @@ void aggiungiLibroACategoria(Categoria *categorie, int *num_categorie, char *nom
                 categorie[i].libri[categorie[i].num_libri++] = nuovo_libro;
             } else {
                 printf("Errore: la categoria '%s' è piena.\n", nome_categoria);
+                exit(0);
             }
             return;
         }
@@ -86,6 +85,7 @@ void aggiungiLibroACategoria(Categoria *categorie, int *num_categorie, char *nom
         (*num_categorie)++;
     } else {
         printf("Errore: numero massimo di categorie raggiunto.\n");
+        exit(0);
     }
 }
 
@@ -94,13 +94,13 @@ void caricaLibriDaCSV(Categoria *categorie, int *num_categorie) {
     FILE *file = fopen(nome_file, "r");
     if (!file) {
         printf("Errore nell'apertura del file CSV.\n");
-        return;
+        exit(0);
     }
 
     char riga[MAX_RIGA_LEN];
     while (fgets(riga, sizeof(riga), file)) {
         Libro nuovo_libro;
-        char categoria[MAX_CATEGORIA_LEN];
+        char categoria[MAX_LENGTH];
         int campo = 0;
         int lunghezza_riga = strlen(riga);
         int i, j = 0;
