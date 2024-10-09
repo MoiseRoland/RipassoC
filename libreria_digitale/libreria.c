@@ -90,7 +90,7 @@ void aggiungiLibroACategoria(Categoria *categorie, int *num_categorie, char *nom
 }
 
 void caricaLibriDaCSV(Categoria *categorie, int *num_categorie) {
-    char *nome_file = "libri.csv";
+    char *nome_file = "libreria_libri.csv";
     FILE *file = fopen(nome_file, "r");
     if (!file) {
         printf("Errore nell'apertura del file CSV.\n");
