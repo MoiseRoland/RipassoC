@@ -10,7 +10,7 @@
 // Definizione della struttura del libro
 typedef struct {
     char titolo[MAX_LENGTH];
-    char autore[MAX_AUTORE_LEN];
+    char autore[MAX_LENGTH];
     int anno;
     float prezzo;
 } Libro;
